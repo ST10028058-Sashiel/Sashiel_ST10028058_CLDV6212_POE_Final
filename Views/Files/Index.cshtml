@@ -1,0 +1,30 @@
+﻿@model IEnumerable<ST10028058_CLDV6212_POE_Final.Models.FileModel>
+
+<h2>Files</h2>
+<p>
+    <a asp-action="Create">Add New File</a>
+</p>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Last Modified</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.DisplaySize</td>
+                <td>@item.LastModified?.ToString("g")</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
