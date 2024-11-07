@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ST10028058_CLDV6212_POE_Final.Areas.Identity.Pages.Account.UserViewModel>
+
+@{
+    ViewData["Title"] = "Registered Accounts";
+}
+
+<h2>Registered Accounts</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Email</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr>
+                <td>@user.FirstName</td>
+                <td>@user.Email</td>
+                <td>@user.Role</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
