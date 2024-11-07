@@ -1,0 +1,50 @@
+﻿@model ST10028058_CLDV6212_POE_Final.Models.Product
+
+@{
+    ViewData["Title"] = "Add Product";
+}
+
+<h2>Add Product</h2>
+
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="Product_Name" class="control-label"></label>
+        <input asp-for="Product_Name" class="form-control" />
+        <span asp-validation-for="Product_Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Product_Price" class="control-label"></label>
+        <input asp-for="Product_Price" type="number" step="0.01" class="form-control" />
+        <span asp-validation-for="Product_Price" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Quantity" class="control-label"></label>
+        <input asp-for="Quantity" type="number" class="form-control" />
+        <span asp-validation-for="Quantity" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="imageFile" class="control-label">Product Image</label>
+        <input type="file" name="imageFile" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Product</button>
+</form>
+
+<div>
+    <a asp-action="Index">Back to Product List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

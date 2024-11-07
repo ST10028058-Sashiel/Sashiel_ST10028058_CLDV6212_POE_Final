@@ -14,5 +14,7 @@ namespace ST10028058_CLDV6212_POE_Final.Data
         public DbSet<User> User { get; set; }
 
         public DbSet<FileModel> Files { get; set; }
+
+        public DbSet<Product> Products { get; set; }
     }
 }
