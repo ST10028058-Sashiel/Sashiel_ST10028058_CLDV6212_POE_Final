@@ -1,54 +1,66 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ST10028058_CLDV6212_POE_Final.Data;
 using ST10028058_CLDV6212_POE_Final.Models;
+using System;
+using System.Linq;
+using ST10028058_CLDV6212_POE_Final.Data;
 
 namespace ST10028058_CLDV6212_POE_Final.Controllers
 {
-    public class FilesController : Controller
+    public class FileController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
-        public FilesController(ApplicationDbContext context)
+        public FileController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment)
         {
             _context = context;
+            _hostEnvironment = hostEnvironment;
         }
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Files.ToListAsync());
-        }
-        public IActionResult Create()
+
+        // GET: File/Upload
+        public IActionResult Upload()
         {
             return View();
         }
 
+        // POST: File/Upload
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,LastModified,UploadedFile")] FileModel fileModel)
+        public async Task<IActionResult> Upload(FileModel fileModel)
         {
-            if (ModelState.IsValid)
+            if (fileModel.UploadedFile != null && fileModel.UploadedFile.Length > 0)
             {
-                if (fileModel.UploadedFile != null)
+                var uploadsFolder = Path.Combine(_hostEnvironment.WebRootPath, "uploads");
+                Directory.CreateDirectory(uploadsFolder); // Ensure the folder exists
+                var uniqueFileName = Guid.NewGuid().ToString() + "_" + fileModel.UploadedFile.FileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                // Save the file to the server
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
-                    // Save the file content as a byte array (optional)
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        await fileModel.UploadedFile.CopyToAsync(memoryStream);
-                        fileModel.Size = fileModel.UploadedFile.Length;
-                        fileModel.Name = fileModel.UploadedFile.FileName;
-                        fileModel.LastModified = DateTimeOffset.Now;
-                        // Optional: Save byte array to the database, depending on your implementation
-                        // fileModel.FileContent = memoryStream.ToArray();
-                    }
+                    await fileModel.UploadedFile.CopyToAsync(fileStream);
                 }
 
-                _context.Add(fileModel);
+                // Save file info in the database
+                fileModel.Name = fileModel.UploadedFile.FileName;
+                fileModel.Size = fileModel.UploadedFile.Length;
+                fileModel.LastModified = DateTimeOffset.Now;
+                _context.Files.Add(fileModel);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+
+                return RedirectToAction("Index");
             }
             return View(fileModel);
+        }
+
+        // GET: File/Index
+        public IActionResult Index()
+        {
+            var files = _context.Files.ToList();
+            return View(files);
         }
     }
 }

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<ST10028058_CLDV6212_POE_Final.Models.FileModel>
+
+@{
+    ViewData["Title"] = "File List";
+}
+
+<h2>Uploaded Files</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>File Name</th>
+            <th>Size</th>
+            <th>Last Modified</th>
+            <th>Download</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var file in Model)
+        {
+            <tr>
+                <td>@file.Name</td>
+                <td>@file.DisplaySize</td>
+                <td>@file.LastModified?.ToString("g")</td>
+                <td>
+                    <a href="@Url.Content("~/uploads/" + file.Name)" download="@file.Name" class="btn btn-primary">Download</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Upload" class="btn btn-primary">Upload New File</a>
+</div>
