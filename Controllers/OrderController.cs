@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using ST10028058_CLDV6212_POE_Final.Data;
 using ST10028058_CLDV6212_POE_Final.Models;
 
@@ -21,7 +23,6 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
             _logger.LogInformation("Fetching all orders...");
             var orders = await _context.Orders
                 .Include(o => o.Product)
-                .Include(o => o.CustomerProfile)
                 .ToListAsync();
             _logger.LogInformation("Orders fetched successfully.");
             return View(orders);
@@ -32,31 +33,20 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
         {
             _logger.LogInformation("Preparing to create a new order...");
 
-            // Fetch products and customers as strongly-typed lists
+            // Fetch products and populate ViewBag.ProductList as a SelectList
             var products = _context.Products.ToList();
-            var customers = _context.CustomerProfiles.ToList();
+            ViewBag.ProductList = new SelectList(products, "Product_Id", "Product_Name");
 
-            // Assign to ViewBag for use in the view
-            ViewBag.Products = products;
-            ViewBag.Customers = customers;
-
-            // Check for empty lists with .Count instead of .Any() to avoid the dynamic issue
+            // Check for empty product list
             if (products.Count == 0)
             {
                 _logger.LogWarning("No products found.");
                 ModelState.AddModelError("", "No products found. Please add products before creating an order.");
             }
 
-            if (customers.Count == 0)
-            {
-                _logger.LogWarning("No customers found.");
-                ModelState.AddModelError("", "No customers found. Please add customers before creating an order.");
-            }
-
             _logger.LogInformation("Create order form is ready.");
             return View();
         }
-
 
         // Process the creation of an order
         [HttpPost]
@@ -64,7 +54,6 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
         {
             _logger.LogInformation("Creating a new order...");
             _logger.LogInformation($"Selected ProductId: {order.ProductId}");
-            _logger.LogInformation($"Selected CustomerProfileId: {order.CustomerProfileId}");
 
             if (ModelState.IsValid)
             {
@@ -82,14 +71,13 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
                 _logger.LogError($"Validation error: {error.ErrorMessage}");
             }
 
-            // Reload dropdown lists if validation fails
-            ViewBag.Products = _context.Products.ToList();
-            ViewBag.Customers = _context.CustomerProfiles.ToList();
+            // Reload ProductList in case of validation failure
+            ViewBag.ProductList = new SelectList(_context.Products.ToList(), "Product_Id", "Product_Name");
+
             return View(order);
         }
 
         // Delete an order
-        // GET: Display delete confirmation view
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -100,7 +88,6 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
 
             var order = await _context.Orders
                 .Include(o => o.Product)
-                .Include(o => o.CustomerProfile)
                 .FirstOrDefaultAsync(o => o.OrderId == id);
 
             if (order == null)
@@ -128,11 +115,5 @@ namespace ST10028058_CLDV6212_POE_Final.Controllers
             _logger.LogInformation($"Order with id {id} deleted successfully.");
             return RedirectToAction(nameof(Index));
         }
-
-
-
-
-
     }
-
 }

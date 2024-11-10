@@ -1,49 +1,25 @@
 ﻿@model ST10028058_CLDV6212_POE_Final.Models.Order
 
-<h2>Create Order</h2>
-
 <form asp-action="Create" method="post">
     <div class="form-group">
-        <label>Product</label>
-        @if (ViewBag.Products != null && ViewBag.Products.Count > 0)
-        {
-            <select asp-for="ProductId" asp-items="@(new SelectList(ViewBag.Products, "ProductId", "ProductName"))" class="form-control">
-                <option value="">Select a Product</option>
-            </select>
-        }
-        else
-        {
-            <p>No products available.</p>
-        }
+        <label asp-for="ProductId" class="control-label"></label>
+        <select asp-for="ProductId" asp-items="ViewBag.ProductList" class="form-control">
+            <option value="">Please select a product</option>
+        </select>
         <span asp-validation-for="ProductId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label>Quantity</label>
+        <label asp-for="Quantity" class="control-label"></label>
         <input asp-for="Quantity" class="form-control" />
         <span asp-validation-for="Quantity" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label>Customer</label>
-        @if (ViewBag.Customers != null && ViewBag.Customers.Count > 0)
-        {
-            <select asp-for="CustomerProfileId" asp-items="@(new SelectList(ViewBag.Customers, "Id", "FullName"))" class="form-control">
-                <option value="">Select a Customer</option>
-            </select>
-        }
-        else
-        {
-            <p>No customers available.</p>
-        }
-        <span asp-validation-for="CustomerProfileId" class="text-danger"></span>
+        <label asp-for="OrderDate" class="control-label"></label>
+        <input asp-for="OrderDate" class="form-control" type="date" />
+        <span asp-validation-for="OrderDate" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="submit" class="btn btn-primary">Create Order</button>
 </form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
-
-
